@@ -9,9 +9,9 @@ public class Clinic {
     String name;
     String country;
     String city;
-    Double nevirapine;
-    Double stavudine;
-    Double zidotabine;
+    Integer nevirapine;
+    Integer stavudine;
+    Integer zidotabine;
 
     public String getId() {
         return id;
@@ -45,28 +45,27 @@ public class Clinic {
         this.city = city;
     }
 
-    public Double getNevirapine() {
+    public Integer getNevirapine() {
         return nevirapine;
     }
 
-    public void setNevirapine(Double nevirapine) {
+    public void setNevirapine(Integer nevirapine) {
         this.nevirapine = nevirapine;
     }
 
-    public Double getStavudine() {
+    public Integer getStavudine() {
         return stavudine;
     }
 
-    public void setStavudine(Double stavudine) {
+    public void setStavudine(Integer stavudine) {
         this.stavudine = stavudine;
     }
 
-    public Double getZidotabine() {
+    public Integer getZidotabine() {
         return zidotabine;
     }
 
-    public void setZidotabine(Double zidotabine) {
+    public void setZidotabine(Integer zidotabine) {
         this.zidotabine = zidotabine;
     }
-
 }

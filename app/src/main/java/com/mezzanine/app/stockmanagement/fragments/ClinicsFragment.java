@@ -37,8 +37,6 @@ public class ClinicsFragment extends Fragment {
             ListView mListView = (ListView) rootView.findViewById(R.id.clinicListView);
             List<Clinic> clinicList = StockManagement.getClinicList();
             displayLog("clinic list size "+clinicList.size());
-            //StockManagement.setClinicAdapter(new ClinicAdapter(StockManagement.getMainActivity(), clinicList));
-            //displayLog("context "+getContext().toString());
             mListView.setAdapter(StockManagement.getClinicAdapter());
 
 

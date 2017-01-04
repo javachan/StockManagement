@@ -19,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.mezzanine.app.stockmanagement.R;
 import com.mezzanine.app.stockmanagement.StockManagement;
@@ -75,6 +76,8 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         DatabaseReference myClinics = database.getReference("clinics");
 
         //populateDatabase();
+        DatabaseReference myInventory = database.getReference("inventory");
+        getQuery(myInventory);
 
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
@@ -134,19 +137,19 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
                 while (iterator.hasNext()) {
 
                     DataSnapshot dataSnapshot1 = iterator.next();
-                    displayLog(""+dataSnapshot1.toString());
+                    //displayLog(""+dataSnapshot1.toString());
                     Clinic clinic = dataSnapshot1.getValue(Clinic.class);
                     clinic.setId(dataSnapshot1.getKey());
-                    displayLog("id "+clinic.getId());
-                    displayLog("name "+clinic.getName());
-                    displayLog("country "+clinic.getCountry());
-                    displayLog("city "+clinic.getCity());
+                    //displayLog("id "+clinic.getId());
+                    //displayLog("name "+clinic.getName());
+                    //displayLog("country "+clinic.getCountry());
+                    //displayLog("city "+clinic.getCity());
                     StockManagement.getClinicList().add(clinic);
 
                 }
                 try {
                     //StockManagement.setClinicList(clinicList);
-                    displayLog("clinic list size "+StockManagement.getClinicList().size());
+                    //displayLog("clinic list size "+StockManagement.getClinicList().size());
                     StockManagement.getClinicAdapter().notifyDataSetChanged();
                 }
                 catch (Exception e){
@@ -160,60 +163,6 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
                 Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
-/*
-        // Read from the database
-        myRef.child("A").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                //String value = dataSnapshot.getValue(String.class);
-                //Log.d(TAG, "Value is: " + value);
-                Iterable<DataSnapshot> iter = dataSnapshot.getChildren();
-                Iterator<DataSnapshot> iterator = iter.iterator();
-                while (iterator.hasNext()) {
-                    //displayLog("one "+iterator.toString());
-                    DataSnapshot dataSnapshot1 = iterator.next();
-                    displayLog("A "+dataSnapshot1.toString());
-
-                    //iterator.next();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                //String value = dataSnapshot.getValue(String.class);
-                //Log.d(TAG, "Value is: " + value);
-                Iterable<DataSnapshot> iter = dataSnapshot.getChildren();
-                Iterator<DataSnapshot> iterator = iter.iterator();
-                while (iterator.hasNext()) {
-                    //displayLog("one "+iterator.toString());
-                    DataSnapshot dataSnapshot1 = iterator.next();
-                    //displayLog(""+dataSnapshot1.toString());
-                    displayLog("key "+dataSnapshot1.getKey().toString());
-                    displayLog("value "+dataSnapshot1.getValue().toString());
-
-                    //iterator.next();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-        */
     }
 
 
@@ -273,6 +222,30 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         }
     }
 
+    public void getQuery(DatabaseReference databaseReference){
+        Query query = databaseReference.child("A").orderByValue().endAt(20);
+
+        //displayLog("query "+query.toString());
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                displayLog("on data change snapshot");
+                Iterable<DataSnapshot> iter = dataSnapshot.getChildren();
+                Iterator<DataSnapshot> iterator = iter.iterator();
+                while (iterator.hasNext()) {
+                    DataSnapshot dataSnapshot1 = iterator.next();
+                    displayLog("key "+dataSnapshot1.getKey().toString());
+                    displayLog("value "+dataSnapshot1.getValue().toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void populateDatabase(){
         DatabaseReference myRef = database.getReference("clinics");
         //String text = editText.getText().toString().trim();
@@ -281,9 +254,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("Kenya");
         clinic.setCity("Eldoret");
         clinic.setName("A");
-        //clinic.setNevirapine(6.0);
-        //clinic.setStavudine(8.0);
-        //clinic.setZidotabine(12.0);
+        //clinic.setNevirapine(6);
+        //clinic.setStavudine(8);
+        //clinic.setZidotabine(12);
         //myRef.setValue(clinic);
         myRef.child("A").setValue(clinic);
 
@@ -291,9 +264,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("Uganda");
         clinic.setCity("Tororo");
         clinic.setName("B");
-        //clinic.setNevirapine(17.0);
-        //clinic.setStavudine(12.0);
-        //clinic.setZidotabine(32.0);
+        //clinic.setNevirapine(17);
+        //clinic.setStavudine(12);
+        //clinic.setZidotabine(32);
         //myRef.setValue(clinic);
         myRef.child("B").setValue(clinic);
 
@@ -301,9 +274,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("Tanzania");
         clinic.setCity("Moshi");
         clinic.setName("C");
-        //clinic.setNevirapine(13.0);
-        //clinic.setStavudine(8.0);
-        //clinic.setZidotabine(24.0);
+        //clinic.setNevirapine(13);
+        //clinic.setStavudine(8);
+        //clinic.setZidotabine(24);
         //myRef.setValue(clinic);
         myRef.child("C").setValue(clinic);
 
@@ -311,9 +284,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("Ethiopia");
         clinic.setCity("Addis Ababa");
         clinic.setName("D");
-        //clinic.setNevirapine(9.0);
-        //clinic.setStavudine(23.0);
-        //clinic.setZidotabine(15.0);
+        //clinic.setNevirapine(9);
+        //clinic.setStavudine(23);
+        //clinic.setZidotabine(15);
         //myRef.setValue(clinic);
         myRef.child("D").setValue(clinic);
 
@@ -321,9 +294,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("Sudan");
         clinic.setCity("Khartoum");
         clinic.setName("E");
-        //clinic.setNevirapine(18.0);
-        //clinic.setStavudine(12.0);
-        //clinic.setZidotabine(18.0);
+        //clinic.setNevirapine(18);
+        //clinic.setStavudine(12);
+        //clinic.setZidotabine(18);
         //myRef.setValue(clinic);
         myRef.child("E").setValue(clinic);
 
@@ -331,9 +304,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("South Sudan");
         clinic.setCity("Juba");
         clinic.setName("F");
-        //clinic.setNevirapine(12.0);
-        //clinic.setStavudine(31.0);
-        //clinic.setZidotabine(1.0);
+        //clinic.setNevirapine(12);
+        //clinic.setStavudine(31);
+        //clinic.setZidotabine(1);
         //myRef.setValue(clinic);
         myRef.child("F").setValue(clinic);
 
@@ -341,9 +314,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("DRC");
         clinic.setCity("Kinshasa");
         clinic.setName("G");
-        //clinic.setNevirapine(21.0);
-        //clinic.setStavudine(31.0);
-        //clinic.setZidotabine(12.0);
+        //clinic.setNevirapine(21);
+        //clinic.setStavudine(31);
+        //clinic.setZidotabine(12);
         //myRef.setValue(clinic);
         myRef.child("G").setValue(clinic);
 
@@ -351,9 +324,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("Zimbabwe");
         clinic.setCity("Harare");
         clinic.setName("H");
-        //clinic.setNevirapine(20.0);
-        //clinic.setStavudine(19.0);
-        //clinic.setZidotabine(40.0);
+        //clinic.setNevirapine(20);
+        //clinic.setStavudine(19);
+        //clinic.setZidotabine(40);
         //myRef.setValue(clinic);
         myRef.child("H").setValue(clinic);
 
@@ -361,9 +334,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("Mozambique");
         clinic.setCity("Maputo");
         clinic.setName("I");
-        //clinic.setNevirapine(20.0);
-        //clinic.setStavudine(10.0);
-        //clinic.setZidotabine(27.0);
+        //clinic.setNevirapine(20);
+        //clinic.setStavudine(10);
+        //clinic.setZidotabine(27);
         //myRef.setValue(clinic);
         myRef.child("I").setValue(clinic);
 
@@ -371,9 +344,9 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         clinic.setCountry("Malawi");
         clinic.setCity("Lilongwe");
         clinic.setName("J");
-        //clinic.setNevirapine(21.0);
-        //clinic.setStavudine(31.0);
-        //clinic.setZidotabine(10.0);
+        //clinic.setNevirapine(21);
+        //clinic.setStavudine(31);
+        //clinic.setZidotabine(10);
         //myRef.setValue(clinic);
         myRef.child("J").setValue(clinic);
 
@@ -381,54 +354,54 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
 
         Clinic clinic1 = new Clinic();
 
-        clinic1.setNevirapine(6.0);
-        clinic1.setStavudine(8.0);
-        clinic1.setZidotabine(12.0);
+        clinic1.setNevirapine(6);
+        clinic1.setStavudine(8);
+        clinic1.setZidotabine(12);
         myRef2.child("A").setValue(clinic1);
 
-        clinic1.setNevirapine(17.0);
-        clinic1.setStavudine(12.0);
-        clinic1.setZidotabine(32.0);
+        clinic1.setNevirapine(17);
+        clinic1.setStavudine(12);
+        clinic1.setZidotabine(32);
         myRef2.child("B").setValue(clinic1);
 
-        clinic1.setNevirapine(13.0);
-        clinic1.setStavudine(8.0);
-        clinic1.setZidotabine(24.0);
+        clinic1.setNevirapine(13);
+        clinic1.setStavudine(8);
+        clinic1.setZidotabine(24);
         myRef2.child("C").setValue(clinic1);
 
-        clinic1.setNevirapine(9.0);
-        clinic1.setStavudine(23.0);
-        clinic1.setZidotabine(15.0);
+        clinic1.setNevirapine(9);
+        clinic1.setStavudine(23);
+        clinic1.setZidotabine(15);
         myRef2.child("D").setValue(clinic1);
 
-        clinic1.setNevirapine(18.0);
-        clinic1.setStavudine(12.0);
-        clinic1.setZidotabine(18.0);
+        clinic1.setNevirapine(18);
+        clinic1.setStavudine(12);
+        clinic1.setZidotabine(18);
         myRef2.child("E").setValue(clinic1);
 
-        clinic.setNevirapine(12.0);
-        clinic.setStavudine(31.0);
-        clinic.setZidotabine(1.0);
+        clinic.setNevirapine(12);
+        clinic.setStavudine(31);
+        clinic.setZidotabine(1);
         myRef2.child("F").setValue(clinic1);
 
-        clinic1.setNevirapine(21.0);
-        clinic1.setStavudine(31.0);
-        clinic1.setZidotabine(12.0);
+        clinic1.setNevirapine(21);
+        clinic1.setStavudine(31);
+        clinic1.setZidotabine(12);
         myRef2.child("G").setValue(clinic1);
 
-        clinic1.setNevirapine(20.0);
-        clinic1.setStavudine(19.0);
-        clinic1.setZidotabine(40.0);
+        clinic1.setNevirapine(20);
+        clinic1.setStavudine(19);
+        clinic1.setZidotabine(40);
         myRef2.child("H").setValue(clinic1);
 
-        clinic1.setNevirapine(20.0);
-        clinic1.setStavudine(10.0);
-        clinic1.setZidotabine(27.0);
+        clinic1.setNevirapine(20);
+        clinic1.setStavudine(10);
+        clinic1.setZidotabine(27);
         myRef2.child("I").setValue(clinic1);
 
-        clinic1.setNevirapine(21.0);
-        clinic1.setStavudine(31.0);
-        clinic1.setZidotabine(10.0);
+        clinic1.setNevirapine(21);
+        clinic1.setStavudine(31);
+        clinic1.setZidotabine(10);
         myRef2.child("J").setValue(clinic1);
     }
     public static List<Clinic> getClinicList() {
