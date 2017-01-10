@@ -25,21 +25,16 @@ import java.util.List;
  */
 public class ClinicsFragment extends Fragment {
     private static final String TAG = "ClinicsFragment";
-    //private static ClinicAdapter clinicAdapter;
-    //public ClinicsFragment(){}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_clinics, container, false);
         try{
-
             ListView mListView = (ListView) rootView.findViewById(R.id.clinicListView);
             List<Clinic> clinicList = StockManagement.getClinicList();
             displayLog("clinic list size "+clinicList.size());
             mListView.setAdapter(StockManagement.getClinicAdapter());
-
-
         }
         catch (Exception e){
             displayLog("clinic adapater error "+e.toString());

@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mezzanine.app.stockmanagement.R;
+import com.mezzanine.app.stockmanagement.StockManagement;
 import com.mezzanine.app.stockmanagement.activities.MainActivity;
 import com.mezzanine.app.stockmanagement.models.Clinic;
 import com.mezzanine.app.stockmanagement.utilities.Utilities;
@@ -33,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 import static android.app.Activity.*;
@@ -48,6 +50,7 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
     HashMap<Clinic, Integer> mIdMap = new HashMap<>();
     FirebaseDatabase database;
     DatabaseReference myClinics ;
+    Utilities utilities;
 
     // View lookup cache
     private static class ViewHolder {
@@ -69,11 +72,13 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
         this.context = context;
         this.rowItems = rowItems;
         this.database = database;
+        utilities = new Utilities();
         myClinics = database.getReference("inventory");
         displayLog("row items size "+rowItems);
         for (int i = 0; i < rowItems.size(); ++i) {
             mIdMap.put(rowItems.get(i), i);
         }
+
     }
 /*
     @Override
@@ -114,7 +119,7 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
             }
             try{
                 final Clinic row_pos = rowItems.get(position);
-                viewHolder.clinic.setText(row_pos.getId());
+                viewHolder.clinic.setText(row_pos.getName());
                 viewHolder.location.setText(row_pos.getCity()+", "+row_pos.getCountry());
 /*
                 if(row_pos.getNevirapine() == 1){
@@ -147,6 +152,13 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
 
 */
                     try{
+                        try{
+                            //StockManagement.getNotificationManager().cancelAll();
+                        }
+                        catch (Exception e){
+                            displayLog("Error clearing notifications "+e.toString());
+                        }
+
 
                     myClinics.child(row_pos.getId()).addValueEventListener(new ValueEventListener() {
                         @Override
@@ -211,6 +223,7 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
                                         break;
                                 }
                             }
+                            StockManagement.getClinicAdapter().notifyDataSetChanged();
                         }
 
                         @Override
@@ -242,6 +255,12 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
                                 valBefore = Integer.parseInt(result[0]);
                                 valAfter = valBefore - 1;
                                 row_pos.setNevirapine(valAfter);
+                                try{
+                                    StockManagement.getNotificationMessages().clear();
+                                }
+                                catch (Exception e){
+                                    displayLog("Error clearing notification messages "+e.toString());
+                                }
                                 if(valAfter == 1){
                                     viewHolder.nevarapineItemsTextView.setText(row_pos.getNevirapine().toString()+" item");
                                     viewHolder.nevarapineDispenseButton.setEnabled(true);
@@ -278,7 +297,6 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
                                 String[] result = value.split("\\s");
                                 currentValue = Integer.parseInt(result[0]);
                             }
-                            Utilities utilities = new Utilities();
                             utilities.showAddStockDialogBox(context, myClinics,row_pos.getId(),row_pos.getName(),"nevirapine",currentValue);
                         }
                     });
@@ -305,6 +323,12 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
                                 valBefore = Integer.parseInt(result[0]);
                                 valAfter = valBefore - 1;
                                 row_pos.setStavudine(valAfter);
+                                try{
+                                    StockManagement.getNotificationMessages().clear();
+                                }
+                                catch (Exception e){
+                                    displayLog("Error clearing notification messages "+e.toString());
+                                }
                                 if(valAfter == 1){
                                     viewHolder.stavudineItemsTextView.setText(row_pos.getStavudine().toString()+" item");
                                     viewHolder.stavudineDispenseButton.setEnabled(true);
@@ -341,7 +365,6 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
                                 String[] result = value.split("\\s");
                                 currentValue = Integer.parseInt(result[0]);
                             }
-                            Utilities utilities = new Utilities();
                             utilities.showAddStockDialogBox(context, myClinics,row_pos.getId(),row_pos.getName(),"stavudine",currentValue);
 
                         }
@@ -369,6 +392,12 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
                                 valBefore = Integer.parseInt(result[0]);
                                 valAfter = valBefore - 1;
                                 row_pos.setZidotabine(valAfter);
+                                try{
+                                    StockManagement.getNotificationMessages().clear();
+                                }
+                                catch (Exception e){
+                                    displayLog("Error clearing notification messages "+e.toString());
+                                }
                                 if(valAfter == 1){
                                     viewHolder.zidotabineItemsTextView.setText(row_pos.getZidotabine().toString()+" item");
                                     viewHolder.zidotabineDispenseButton.setEnabled(true);
@@ -405,7 +434,6 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
                                 String[] result = value.split("\\s");
                                 currentValue = Integer.parseInt(result[0]);
                             }
-                            Utilities utilities = new Utilities();
                             utilities.showAddStockDialogBox(context, myClinics,row_pos.getId(),row_pos.getName(),"zidotabine",currentValue);
                         }
                     });
@@ -430,6 +458,6 @@ public class ClinicAdapter extends ArrayAdapter<Clinic> {
     }
 
     private void displayLog(String s){
-        Log.i(TAG,s);
+        //Log.i(TAG,s);
     }
 }

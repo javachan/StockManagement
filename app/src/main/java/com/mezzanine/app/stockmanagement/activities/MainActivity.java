@@ -2,12 +2,20 @@ package com.mezzanine.app.stockmanagement.activities;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.util.Log;
@@ -24,13 +32,19 @@ import com.google.firebase.database.ValueEventListener;
 import com.mezzanine.app.stockmanagement.R;
 import com.mezzanine.app.stockmanagement.StockManagement;
 import com.mezzanine.app.stockmanagement.adapters.ClinicAdapter;
+import com.mezzanine.app.stockmanagement.adapters.InventoryAdapter;
+import com.mezzanine.app.stockmanagement.database.DataProvider;
 import com.mezzanine.app.stockmanagement.fragments.ClinicsFragment;
 import com.mezzanine.app.stockmanagement.fragments.InventoryFragment;
 import com.mezzanine.app.stockmanagement.models.Clinic;
+import com.mezzanine.app.stockmanagement.models.Inventory;
+import com.mezzanine.app.stockmanagement.utilities.Utilities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static com.mezzanine.app.stockmanagement.utilities.Constants.CLINICLIST;
 
@@ -53,31 +67,36 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
     private static List<Clinic> clinicList;
     private static Fragment fragmentClinic;
     private static  Fragment fragmentInventory;
-    private FirebaseDatabase database;
+    //private FirebaseDatabase database;
+    private DataProvider dataProvider;
+    private Utilities utilities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dataProvider = new DataProvider(this);
 
         // Write a message to the database
-        database = FirebaseDatabase.getInstance();
+        //database = FirebaseDatabase.getInstance();
+
 
         //clinicList = new ArrayList<>();
         StockManagement.setMainActivity(this);
-        StockManagement.setClinicAdapter(new ClinicAdapter(StockManagement.getMainActivity(), StockManagement.getClinicList(), database));
-
+        utilities = new Utilities();
+        StockManagement.setClinicAdapter(new ClinicAdapter(StockManagement.getMainActivity(), StockManagement.getClinicList(), StockManagement.getDatabase()));
+        StockManagement.setInventoryAdapter(new InventoryAdapter(StockManagement.getMainActivity(),StockManagement.getInventoryList()));
         fragmentClinic = new ClinicsFragment();
         fragmentInventory = new InventoryFragment();
 
-
-
         //final DatabaseReference myRef = database.getReference("clinics");
-        DatabaseReference myClinics = database.getReference("clinics");
+        //DatabaseReference myClinics = database.getReference("clinics");
 
         //populateDatabase();
-        DatabaseReference myInventory = database.getReference("inventory");
-        getQuery(myInventory);
+        //final DatabaseReference myInventory = database.getReference("inventory");
+        //getQueryKeys(myInventory);
+
+
 
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
@@ -124,7 +143,7 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
                         .setTabListener(this));
 
         // Read from the database
-        myClinics.addValueEventListener(new ValueEventListener() {
+        StockManagement.getMyClinics().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -140,20 +159,41 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
                     //displayLog(""+dataSnapshot1.toString());
                     Clinic clinic = dataSnapshot1.getValue(Clinic.class);
                     clinic.setId(dataSnapshot1.getKey());
+                    StockManagement.getMyInventory().child(dataSnapshot1.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot2) {
+                            Iterable<DataSnapshot> iter = dataSnapshot2.getChildren();
+                            Iterator<DataSnapshot> iterator = iter.iterator();
+                            while (iterator.hasNext()) {
+
+                                DataSnapshot dataSnapshot4 = iterator.next();
+                                displayLog(dataSnapshot4.getKey()+" inventory results "+dataSnapshot4.toString());
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                     //displayLog("id "+clinic.getId());
                     //displayLog("name "+clinic.getName());
                     //displayLog("country "+clinic.getCountry());
                     //displayLog("city "+clinic.getCity());
                     StockManagement.getClinicList().add(clinic);
-
-                }
-                try {
-                    //StockManagement.setClinicList(clinicList);
-                    //displayLog("clinic list size "+StockManagement.getClinicList().size());
-                    StockManagement.getClinicAdapter().notifyDataSetChanged();
-                }
-                catch (Exception e){
-                    displayLog("stock management error "+e.toString());
+                    try{
+                        long result = dataProvider.insertClinic(clinic);
+                        displayLog("clinic inserted "+result);
+                    }
+                    catch (Exception e){
+                        displayLog("clinic insert error "+e.toString());
+                    }
+                    try {
+                        StockManagement.getClinicAdapter().notifyDataSetChanged();
+                    }
+                    catch (Exception e){
+                        displayLog("stock management error "+e.toString());
+                    }
                 }
             }
 
@@ -163,6 +203,8 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
                 Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
+
+        getQueryValues(StockManagement.getMyInventory());
     }
 
 
@@ -173,6 +215,10 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // When the given tab is selected, switch to the corresponding page in the ViewPager.
+        if(tab.getPosition() == 1){
+            StockManagement.getMainActivity().getQueryValues(StockManagement.getMyInventory());
+        }
+
         mViewPager.setCurrentItem(tab.getPosition());
     }
 
@@ -200,11 +246,12 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
                     // a launchpad into the other demonstrations in this example application.
 
                     //Bundle args = new Bundle(CLINICLIST,getClinicList());
+
+
                     return getFragmentClinic();
 
                 default:
                     // The other sections of the app are dummy placeholders.
-
 
                     return getFragmentInventory();
             }
@@ -222,38 +269,91 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         }
     }
 
-    public void getQuery(DatabaseReference databaseReference){
-        Query query = databaseReference.child("A").orderByValue().endAt(20);
+    public void getQueryValues(final DatabaseReference databaseReference){
 
-        //displayLog("query "+query.toString());
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                displayLog("on data change snapshot");
-                Iterable<DataSnapshot> iter = dataSnapshot.getChildren();
-                Iterator<DataSnapshot> iterator = iter.iterator();
-                while (iterator.hasNext()) {
-                    DataSnapshot dataSnapshot1 = iterator.next();
-                    displayLog("key "+dataSnapshot1.getKey().toString());
-                    displayLog("value "+dataSnapshot1.getValue().toString());
+        final List<Clinic> clinicList = dataProvider.getAllClinics();
+        final HashMap<String, Clinic> hashMapClinics = new HashMap<>();
+        StockManagement.getInventoryList().clear();
+        StockManagement.getClinicInventoryHashMap().clear();
+        final List<String> messages = new ArrayList<>();
+        try{
+            StockManagement.getNotificationMessages().clear();
+            //StockManagement.getNotificationManager().cancelAll();
+        }
+        catch (Exception e){
+            displayLog("Error clearing notifications "+e.toString());
+        }
+        for(final Clinic clinic : clinicList){
+            final String key = clinic.getId();
+            Query query = databaseReference.child(key).orderByValue().endAt(5);
+            query.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Iterable<DataSnapshot> iter = dataSnapshot.getChildren();
+                    Iterator<DataSnapshot> iterator = iter.iterator();
+                    List<Inventory> inventoryList = new ArrayList<>();
+
+                    while (iterator.hasNext()) {
+                        DataSnapshot dataSnapshot1 = iterator.next();
+                        Inventory inventory = new Inventory();
+                        inventory.setId(key);
+                        inventory.setDrugName(dataSnapshot1.getKey().toString());
+                        inventory.setDrugItems(dataSnapshot1.getValue().toString());
+                        inventoryList.add(inventory);
+                        messages.add(utilities.toTitleCase(clinic.getName())+" is low on "+inventory.getDrugName().toUpperCase());
+                        if(StockManagement.getClinicInventoryHashMap().containsKey(key)){
+                            StockManagement.getClinicInventoryHashMap().remove(key);
+                        }
+                        else {
+                            hashMapClinics.put(key,clinic);
+                        }
+                    }
+                    StockManagement.getInventoryList().clear();
+                    for(Map.Entry<String, Clinic> entry : hashMapClinics.entrySet()){
+                        StockManagement.getInventoryList().add(entry.getValue());
+                    }
+                    StockManagement.getClinicInventoryHashMap().put(key,inventoryList);
+                    StockManagement.getInventoryAdapter().notifyDataSetChanged();
+                    try {
+                        if (StockManagement.getInventoryList().size() > 0) {
+                            StockManagement.getClinicsToBeStockedTextView().setText(getResources().getString(R.string.clinicstobestocked));
+                        } else {
+                            StockManagement.getClinicsToBeStockedTextView().setText(getResources().getString(R.string.clinicsfullystocked));
+                        }
+                    }
+                    catch (Exception e){
+                        displayLog("Error updating getClinicsToBeStockedTextView "+e.toString());
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
+
+    }
+
+    private Clinic getClinicDetails(String key){
+        Clinic clinic = new Clinic();
+        try{
+            clinic = dataProvider.getClinicDetails(key);
+        }
+        catch (Exception e){
+            displayLog("Get clinic details error "+e.toString());
+        }
+        return clinic;
     }
 
     private void populateDatabase(){
-        DatabaseReference myRef = database.getReference("clinics");
+        DatabaseReference myRef = StockManagement.getDatabase().getReference("clinics");
         //String text = editText.getText().toString().trim();
         //myRef.setValue(text);
         Clinic clinic = new Clinic();
         clinic.setCountry("Kenya");
         clinic.setCity("Eldoret");
-        clinic.setName("A");
+        clinic.setName("Eldyclinic");
         //clinic.setNevirapine(6);
         //clinic.setStavudine(8);
         //clinic.setZidotabine(12);
@@ -263,7 +363,7 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         //Clinic clinic = new Clinic();
         clinic.setCountry("Uganda");
         clinic.setCity("Tororo");
-        clinic.setName("B");
+        clinic.setName("Toroclinic");
         //clinic.setNevirapine(17);
         //clinic.setStavudine(12);
         //clinic.setZidotabine(32);
@@ -273,7 +373,7 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         //Clinic clinic = new Clinic();
         clinic.setCountry("Tanzania");
         clinic.setCity("Moshi");
-        clinic.setName("C");
+        clinic.setName("Moshiclinic");
         //clinic.setNevirapine(13);
         //clinic.setStavudine(8);
         //clinic.setZidotabine(24);
@@ -283,7 +383,7 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         //Clinic clinic = new Clinic();
         clinic.setCountry("Ethiopia");
         clinic.setCity("Addis Ababa");
-        clinic.setName("D");
+        clinic.setName("Addisclinic");
         //clinic.setNevirapine(9);
         //clinic.setStavudine(23);
         //clinic.setZidotabine(15);
@@ -293,7 +393,7 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         //Clinic clinic = new Clinic();
         clinic.setCountry("Sudan");
         clinic.setCity("Khartoum");
-        clinic.setName("E");
+        clinic.setName("Sudaclinic");
         //clinic.setNevirapine(18);
         //clinic.setStavudine(12);
         //clinic.setZidotabine(18);
@@ -303,7 +403,7 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         //Clinic clinic = new Clinic();
         clinic.setCountry("South Sudan");
         clinic.setCity("Juba");
-        clinic.setName("F");
+        clinic.setName("Jubaclinic");
         //clinic.setNevirapine(12);
         //clinic.setStavudine(31);
         //clinic.setZidotabine(1);
@@ -313,7 +413,7 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         //Clinic clinic = new Clinic();
         clinic.setCountry("DRC");
         clinic.setCity("Kinshasa");
-        clinic.setName("G");
+        clinic.setName("Kliniki");
         //clinic.setNevirapine(21);
         //clinic.setStavudine(31);
         //clinic.setZidotabine(12);
@@ -323,7 +423,7 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         //Clinic clinic = new Clinic();
         clinic.setCountry("Zimbabwe");
         clinic.setCity("Harare");
-        clinic.setName("H");
+        clinic.setName("Haraclinic");
         //clinic.setNevirapine(20);
         //clinic.setStavudine(19);
         //clinic.setZidotabine(40);
@@ -333,7 +433,7 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         //Clinic clinic = new Clinic();
         clinic.setCountry("Mozambique");
         clinic.setCity("Maputo");
-        clinic.setName("I");
+        clinic.setName("Mapuclinic");
         //clinic.setNevirapine(20);
         //clinic.setStavudine(10);
         //clinic.setZidotabine(27);
@@ -343,14 +443,14 @@ public class MainActivity  extends FragmentActivity implements ActionBar.TabList
         //Clinic clinic = new Clinic();
         clinic.setCountry("Malawi");
         clinic.setCity("Lilongwe");
-        clinic.setName("J");
+        clinic.setName("Liclinic");
         //clinic.setNevirapine(21);
         //clinic.setStavudine(31);
         //clinic.setZidotabine(10);
         //myRef.setValue(clinic);
         myRef.child("J").setValue(clinic);
 
-        DatabaseReference myRef2 = database.getReference("inventory");
+        DatabaseReference myRef2 = StockManagement.getDatabase().getReference("inventory");
 
         Clinic clinic1 = new Clinic();
 
