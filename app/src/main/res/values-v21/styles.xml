@@ -47,7 +47,7 @@
 
         <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     -->
-    <style name="OkQueueTab"  parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="OkQueueTab" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:background">@drawable/tab_bar_background</item>
     </style>
 

@@ -2,46 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <RelativeLayout
-        android:layout_marginTop="10dip"
         android:id="@+id/rlClinicToBeStocked"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip">
+
         <TextView
             android:id="@+id/clinicName"
-            android:text="Clinic A"
-            android:textSize="18dip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:paddingLeft="20dip"
             android:paddingRight="20dip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textSize="18dip" />
+
         <TextView
             android:id="@+id/location"
-            android:text="Nairobi, Kenya"
-            android:textSize="14dip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:paddingLeft="20dip"
             android:paddingRight="20dip"
-            android:layout_alignParentRight="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textSize="14dip" />
     </RelativeLayout>
+
     <LinearLayout
-        android:layout_marginTop="20dip"
-        android:orientation="vertical"
         android:id="@+id/rlDrugList"
-        android:layout_below="@+id/rlClinicToBeStocked"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-<!--
-        <ListView
-            android:id="@+id/drugItemsListView"
-            android:layout_marginTop="10dip"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </ListView>
-
-        -->
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rlClinicToBeStocked"
+        android:layout_marginTop="20dip"
+        android:orientation="vertical">
 
 
     </LinearLayout>

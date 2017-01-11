@@ -2,6 +2,9 @@ package com.mezzanine.app.stockmanagement.utilities;
 
 /**
  * Created by ramogiochola on 1/4/17.
+ *
+ * Holds various constant variables
+ *
  */
 
 public class Constants {

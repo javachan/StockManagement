@@ -14,14 +14,12 @@ import android.widget.ListView;
 
 import com.mezzanine.app.stockmanagement.R;
 import com.mezzanine.app.stockmanagement.StockManagement;
-import com.mezzanine.app.stockmanagement.activities.MainActivity;
-import com.mezzanine.app.stockmanagement.adapters.ClinicAdapter;
 import com.mezzanine.app.stockmanagement.models.Clinic;
 
 import java.util.List;
 
 /**
- * A fragment that launches other parts of the demo application.
+ * A fragment that displays all the clinics, their details and the stock level for each clinic.
  */
 public class ClinicsFragment extends Fragment {
     private static final String TAG = "ClinicsFragment";
@@ -30,21 +28,20 @@ public class ClinicsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_clinics, container, false);
-        try{
+        try {
             ListView mListView = (ListView) rootView.findViewById(R.id.clinicListView);
             List<Clinic> clinicList = StockManagement.getClinicList();
-            displayLog("clinic list size "+clinicList.size());
+            displayLog("clinic list size " + clinicList.size());
             mListView.setAdapter(StockManagement.getClinicAdapter());
-        }
-        catch (Exception e){
-            displayLog("clinic adapater error "+e.toString());
+        } catch (Exception e) {
+            displayLog("clinic adapater error " + e.toString());
         }
 
 
         return rootView;
     }
 
-    private void displayLog(String me){
-        Log.i(TAG,me);
+    private void displayLog(String me) {
+        Log.i(TAG, me);
     }
 }

@@ -2,6 +2,7 @@ package com.mezzanine.app.stockmanagement.models;
 
 /**
  * Created by ramogiochola on 1/4/17.
+ *
  */
 
 public class Clinic {

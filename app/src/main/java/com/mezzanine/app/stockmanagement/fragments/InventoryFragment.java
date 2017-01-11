@@ -17,11 +17,16 @@ import java.util.List;
 
 /**
  * Created by ramogiochola on 1/4/17.
+ *
+ * The fragment that only displays clinics with inventory levels that are below 5.
  */
 
-public class InventoryFragment  extends Fragment {
+public class InventoryFragment extends Fragment {
     private static final String TAG = "InventoryFragment";
-    public InventoryFragment(){}
+
+    public InventoryFragment() {
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -33,21 +38,20 @@ public class InventoryFragment  extends Fragment {
         List<Clinic> inventoryList = StockManagement.getInventoryList();
         mListView.setAdapter(StockManagement.getInventoryAdapter());
         int size = inventoryList.size();
-        displayLog("clinic list size "+size);
-        if(size > 0){
-            //mListView.setVisibility(View.VISIBLE);
+        displayLog("clinic list size " + size);
+        if (size > 0) {
             clinicsToBeStockedMessage.setText(getResources().getString(R.string.clinicstobestocked));
 
 
-        }
-        else {
+        } else {
             clinicsToBeStockedMessage.setText(getResources().getString(R.string.clinicsfullystocked));
             //mListView.setVisibility(View.INVISIBLE);
         }
 
         return rootView;
     }
-    private void displayLog(String me){
-        Log.i(TAG,me);
+
+    private void displayLog(String me) {
+        Log.i(TAG, me);
     }
 }

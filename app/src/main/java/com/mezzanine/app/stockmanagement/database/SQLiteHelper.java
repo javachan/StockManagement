@@ -14,6 +14,8 @@ import static com.mezzanine.app.stockmanagement.utilities.Constants.TABLE_CLINIC
 
 /**
  * Created by ramogiochola on 1/7/17.
+ *
+ * The class that sets up the local database on the mobile phone.
  */
 
 public class SQLiteHelper extends SQLiteOpenHelper {
@@ -24,11 +26,11 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE_CLINIC =
             "create table " + TABLE_CLINICDETAILS + " (" +
                     COLUMN_ID + " integer primary key autoincrement, " +
-                    COLUMN_CLINICKEY +" VARCHAR, "+
-                    COLUMN_CLINICNAME +" VARCHAR, "+
-                    COLUMN_CLINICCITY +" VARCHAR, "+
-                    COLUMN_CLINICCOUNTRY +" VARCHAR, "+
-                    "UNIQUE ( "+COLUMN_CLINICKEY +" ) ON CONFLICT REPLACE);";
+                    COLUMN_CLINICKEY + " VARCHAR, " +
+                    COLUMN_CLINICNAME + " VARCHAR, " +
+                    COLUMN_CLINICCITY + " VARCHAR, " +
+                    COLUMN_CLINICCOUNTRY + " VARCHAR, " +
+                    "UNIQUE ( " + COLUMN_CLINICKEY + " ) ON CONFLICT REPLACE);";
 
     public SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

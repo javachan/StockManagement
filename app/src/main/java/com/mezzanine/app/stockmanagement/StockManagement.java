@@ -8,7 +8,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mezzanine.app.stockmanagement.activities.MainActivity;
 import com.mezzanine.app.stockmanagement.adapters.ClinicAdapter;
-import com.mezzanine.app.stockmanagement.adapters.DrugAdapter;
 import com.mezzanine.app.stockmanagement.adapters.InventoryAdapter;
 import com.mezzanine.app.stockmanagement.models.Clinic;
 import com.mezzanine.app.stockmanagement.models.Inventory;
@@ -19,6 +18,9 @@ import java.util.List;
 
 /**
  * Created by ramogiochola on 1/4/17.
+ *
+ * A class that extends the application class to provide various global variables and methods to the app
+ *
  */
 
 public class StockManagement extends Application {
@@ -26,27 +28,14 @@ public class StockManagement extends Application {
     public static ClinicAdapter clinicAdapter;
     public static List<Clinic> inventoryList;
     public static InventoryAdapter inventoryAdapter;
-    //public static List<Inventory> drugList;
-    //public static DrugAdapter drugAdapter;
     public static MainActivity mainActivity;
     public static HashMap<String, List<Inventory>> clinicInventoryHashMap;
-    public static DatabaseReference myInventory ;
+    public static DatabaseReference myInventory;
     public static FirebaseDatabase database;
     public static DatabaseReference myClinics;
     public static TextView clinicsToBeStockedTextView;
     public static NotificationManager notificationManager;
     public static List<String> notificationMessages;
-    public void onCreate() {
-        super.onCreate();
-        clinicList = new ArrayList<>();
-        inventoryList = new ArrayList<>();
-        //drugList = new ArrayList<>();
-        clinicInventoryHashMap = new HashMap<>();
-        database = FirebaseDatabase.getInstance();
-        myInventory = database.getReference("inventory");
-        myClinics = database.getReference("clinics");
-        notificationMessages = new ArrayList<>();
-    }
 
     public static List<Clinic> getClinicList() {
         return clinicList;
@@ -98,23 +87,6 @@ public class StockManagement extends Application {
         StockManagement.clinicInventoryHashMap.clear();
         StockManagement.clinicInventoryHashMap = clinicInventoryHashMap;
     }
-/*
-    public static List<Inventory> getDrugList() {
-        return drugList;
-    }
-
-    public static void setDrugList(List<Inventory> drugList) {
-        StockManagement.drugList = drugList;
-    }
-
-    public static DrugAdapter getDrugAdapter() {
-        return drugAdapter;
-    }
-
-    public static void setDrugAdapter(DrugAdapter drugAdapter) {
-        StockManagement.drugAdapter = drugAdapter;
-    }
-    */
 
     public static DatabaseReference getMyInventory() {
         return myInventory;
@@ -162,6 +134,20 @@ public class StockManagement extends Application {
 
     public static void setNotificationMessages(List<String> notificationMessages) {
         StockManagement.notificationMessages = notificationMessages;
+    }
+
+    public void onCreate() {
+        super.onCreate();
+        clinicList = new ArrayList<>();
+        inventoryList = new ArrayList<>();
+        clinicInventoryHashMap = new HashMap<>();
+        //connect to the realtime database
+        database = FirebaseDatabase.getInstance();
+        //connect to the inventory table in the realtime database
+        myInventory = database.getReference("inventory");
+        //connect to the clinics table in the realtime database
+        myClinics = database.getReference("clinics");
+        notificationMessages = new ArrayList<>();
     }
 }
 

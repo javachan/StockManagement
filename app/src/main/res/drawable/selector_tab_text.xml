@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- SELECTED COLOR -->
-    <item android:state_selected="true"
-        android:color="#ffffff"/>
+    <item android:color="#ffffff" android:state_selected="true" />
     <!-- UNSELECTED COLOR -->
-    <item android:state_selected="false"
-        android:color="#B3ffffff"/>
+    <item android:color="#B3ffffff" android:state_selected="false" />
 </selector>
