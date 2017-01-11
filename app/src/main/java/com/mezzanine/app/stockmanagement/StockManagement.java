@@ -141,10 +141,13 @@ public class StockManagement extends Application {
         clinicList = new ArrayList<>();
         inventoryList = new ArrayList<>();
         clinicInventoryHashMap = new HashMap<>();
+
         //connect to the realtime database
         database = FirebaseDatabase.getInstance();
+
         //connect to the inventory table in the realtime database
         myInventory = database.getReference("inventory");
+
         //connect to the clinics table in the realtime database
         myClinics = database.getReference("clinics");
         notificationMessages = new ArrayList<>();

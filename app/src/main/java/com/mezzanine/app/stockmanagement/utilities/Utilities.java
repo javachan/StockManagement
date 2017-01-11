@@ -127,7 +127,11 @@ public class Utilities {
             NotificationManager nManager = (NotificationManager) StockManagement.getMainActivity().getSystemService(NOTIFICATION_SERVICE);
             Notification.Builder builder = new Notification.Builder(StockManagement.getMainActivity());
             builder.setContentTitle("Stock Management");
-            builder.setContentText("Notification from Mezannine");
+            String longMessage = "";
+            for (String value : messages) {
+                longMessage = value+" "+System.getProperty("line.separator");
+            }
+            builder.setContentText(longMessage);
             builder.setSmallIcon(R.mipmap.ic_launcher);
             builder.setAutoCancel(true);
             inboxStyle.setBigContentTitle("Warning");
